@@ -4,13 +4,10 @@ from datetime import date
 
 import streamlit as st
 
-from backend_engine import create_claim, get_claim, seed_demo_data
+from backend_engine import create_claim, get_claim, list_claims, seed_demo_data, update_worker_answers
 
 
-st.set_page_config(page_title="Worker Overtime Portal", layout="wide")
-
-
-def main() -> None:
+def render_worker_portal() -> None:
     seed_demo_data()
     st.title("Worker Overtime Portal")
     st.caption("Phase 1 standalone submission portal for electrical industry overtime verification.")
@@ -88,6 +85,44 @@ def main() -> None:
             "uploaded PDF/Excel evidence, and produces a Green/Yellow/Red recommendation."
         )
 
+    st.divider()
+    st.subheader("Answer supervisor questions")
+    df = list_claims()
+    if df.empty:
+        st.info("No submitted claims found.")
+        return
+    answer_df = df[df["supervisor_questions"].fillna("").ne("")]
+    if answer_df.empty:
+        st.success("No supervisor questions are pending for workers.")
+        return
+    options = {
+        f"#{row.id} | {row.employee_name} | {row.claim_date} | {row.analysis_status}": int(row.id)
+        for row in answer_df.itertuples()
+    }
+    selected = st.selectbox("Select your claim", list(options.keys()))
+    claim = get_claim(options[selected])
+    if not claim:
+        return
+    st.text_area("Supervisor questions", value=claim.get("supervisor_questions") or "", height=120, disabled=True)
+    with st.form(f"worker_answer_{claim['id']}"):
+        answers = st.text_area(
+            "Worker answers",
+            value=claim.get("worker_answers") or "",
+            placeholder="Answer each question with timing, location, reason, and proof details.",
+            height=140,
+        )
+        answer_files = st.file_uploader(
+            "Upload additional worker evidence",
+            accept_multiple_files=True,
+            type=["pdf", "xlsx", "xls", "csv", "txt", "log"],
+            key=f"worker_answer_files_{claim['id']}",
+        )
+        saved = st.form_submit_button("Submit answers", type="primary")
+    if saved:
+        update_worker_answers(claim["id"], answers.strip(), answer_files or [])
+        st.success("Worker answers saved and risk re-calculated.")
+        st.rerun()
+
 
 def show_claim_result(claim_id: int) -> None:
     claim = get_claim(claim_id)
@@ -121,4 +156,5 @@ def show_claim_result(claim_id: int) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    st.set_page_config(page_title="Worker Overtime Portal", layout="wide")
+    render_worker_portal()

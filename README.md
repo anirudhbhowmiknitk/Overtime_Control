@@ -1,17 +1,52 @@
-<<<<<<< HEAD
-# AI-Based Overtime Verification System - Phase 1
+# Overtime Control
 
-This is the standalone Phase 1 implementation from the proposal:
+AI-Based Overtime Verification System for electrical operations. Built with Streamlit and Python, it provides worker, engineer, and supervisor workflows, verifies attendance-based overtime, deducts lunch breaks, analyzes work complexity, flags unusual claims, supports Groq AI summaries, and exports management-ready Excel reports.
 
-- `backend_engine.py` - shared backend, SQLite storage, document extraction, risk scoring, Groq hook, and Excel export.
-- `worker_portal.py` - Streamlit portal for employees/workers to submit overtime claims.
-- `supervisor_portal.py` - Streamlit portal for supervisors to review, re-analyze, approve, reject, or escalate claims.
+## What v2 Includes
 
-## Setup
+- `unified_platform_v2.py` - one polished platform with role selection for Worker, Engineer, Supervisor, and Management Dashboard.
+- `worker_portal_v2.py` - individual worker portal.
+- `engineer_portal_v2.py` - individual engineer verification and approval portal.
+- `supervisor_portal_v2.py` - individual supervisor question, answer review, and approval portal.
+- `backend_engine_v2.py` - shared backend, SQLite database, document extraction, risk scoring, Groq hook, and Excel export.
+- `practice_overtime_data_v2.xlsx` - sample Excel workbook for testing uploads.
+
+## Download From GitHub
+
+1. Open the GitHub repository.
+2. Click the green **Code** button.
+3. Choose **Download ZIP**.
+4. Extract the ZIP file.
+5. Open PowerShell inside the extracted project folder.
+
+Or clone it:
+
+```powershell
+git clone <your-repository-url>
+cd <your-repository-folder>
+```
+
+## Install
+
+Create a virtual environment:
+
+```powershell
+python -m venv .venv
+```
+
+Activate it:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Install requirements:
 
 ```powershell
 python -m pip install -r requirements.txt
 ```
+
+## Optional Groq Setup
 
 For Groq free-tier AI summaries, set your API key before launching:
 
@@ -21,22 +56,58 @@ $env:GROQ_API_KEY="your_groq_api_key"
 
 If no Groq key is set, the system still works using the local electrical-industry rules engine.
 
-## Run
-
-Open the worker portal:
+## Run Recommended Unified Platform
 
 ```powershell
-streamlit run worker_portal.py --server.port 8501
+streamlit run unified_platform_v2.py --server.port 8501
 ```
 
-Open the supervisor portal in another terminal:
+Open:
+
+```text
+http://localhost:8501
+```
+
+## Run Individual Portals
+
+Worker:
 
 ```powershell
-streamlit run supervisor_portal.py --server.port 8502
+streamlit run worker_portal_v2.py --server.port 8501
 ```
 
-The apps store data in `data/overtime_phase1.sqlite3` and reports in `data/reports`.
-=======
-# Overtime_Control
-AI-Based Overtime Verification System for electrical operations. Built with Streamlit and Python, it provides worker and supervisor portals, verifies attendance-based overtime, deducts lunch breaks, analyzes work complexity, flags unusual claims, supports Groq AI summaries, and exports management-ready Excel reports.
->>>>>>> 0e2450234f080ba400485b84989dedebfd26d6c9
+Engineer:
+
+```powershell
+streamlit run engineer_portal_v2.py --server.port 8502
+```
+
+Supervisor:
+
+```powershell
+streamlit run supervisor_portal_v2.py --server.port 8503
+```
+
+## Practice Excel File
+
+Use `practice_overtime_data_v2.xlsx` to test uploads. It contains:
+
+- Attendance
+- Overtime Claims
+- Crew Deployment
+- Completion Reports
+- Work Benchmarks
+
+## Data Storage
+
+The app stores data in:
+
+```text
+data/overtime_phase1.sqlite3
+```
+
+Generated reports are saved in:
+
+```text
+data/reports
+```

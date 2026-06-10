@@ -13,9 +13,6 @@ from backend_engine import (
 )
 
 
-st.set_page_config(page_title="Supervisor Overtime Portal", layout="wide")
-
-
 STATUS_COLORS = {
     "Green": "#15803d",
     "Yellow": "#a16207",
@@ -23,7 +20,7 @@ STATUS_COLORS = {
 }
 
 
-def main() -> None:
+def render_supervisor_portal() -> None:
     seed_demo_data()
     st.title("Supervisor Overtime Portal")
     st.caption("Review flagged claims, add technical verification, and export management reports.")
@@ -110,10 +107,10 @@ def review_claim(df) -> None:
     st.subheader("Supervisor verification")
     with st.form(f"supervisor_form_{claim_id}"):
         supervisor_name = st.text_input("Supervisor name", value=claim.get("supervisor_name") or "")
-        supervisor_remarks = st.text_area(
-            "Technical remarks",
-            value=claim.get("supervisor_remarks") or "",
-            placeholder="Example: Additional cable damage found during transformer maintenance; terminal lugs replaced and insulation tested.",
+        supervisor_questions = st.text_area(
+            "Questions to worker and engineer",
+            value=claim.get("supervisor_questions") or "",
+            placeholder="Ask what caused the overtime, what extra work was found, how much time it took, and what proof confirms it.",
             height=130,
         )
         decision = st.selectbox(
@@ -139,7 +136,7 @@ def review_claim(df) -> None:
         update_supervisor_review(
             claim_id=claim_id,
             supervisor_name=supervisor_name.strip(),
-            supervisor_remarks=supervisor_remarks.strip(),
+            supervisor_questions=supervisor_questions.strip(),
             decision=decision,
             files=files or [],
         )
@@ -162,6 +159,8 @@ def show_dashboard(df) -> None:
             "analysis_risk_score",
             "analysis_status",
             "analysis_recommendation",
+            "engineer_name",
+            "engineer_recommendation",
             "supervisor_decision",
         ]
     ].copy()
@@ -220,4 +219,5 @@ def show_export() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    st.set_page_config(page_title="Supervisor Overtime Portal", layout="wide")
+    render_supervisor_portal()
